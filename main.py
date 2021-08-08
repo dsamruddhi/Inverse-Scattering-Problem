@@ -64,7 +64,7 @@ if __name__ == '__main__':
 
     forward_solver = ForwardProblemSolver(scatterer)
     direct_field, direct_power, scattered_field, total_field, total_power = forward_solver.generate_forward_data()
-    ForwardProblemSolver.get_field_plots(total_field, direct_field, scattered_field)
+    ForwardProblemSolver.get_field_plots(total_field, direct_field, scattered_field, 39)
     ForwardProblemSolver.save_data(scatterer, direct_field, direct_power, scattered_field, total_field, total_power)
 
     """" Inverse problem """
