@@ -63,11 +63,11 @@ class ForwardProblemSolver:
         return direct_field, direct_power, scattered_field, total_field, total_power
 
     @staticmethod
-    def get_field_plots(total_field, direct_field, scattered_field):
+    def get_field_plots(total_field, direct_field, scattered_field, tx_num):
         plt.figure()
-        plt.plot(range(ForwardProblemSolver.rx_count - 1), np.abs(total_field[:, 19]), label="Total Field")
-        plt.plot(range(ForwardProblemSolver.rx_count - 1), np.abs(direct_field[:, 19]), label="Incident Field")
-        plt.plot(range(ForwardProblemSolver.rx_count - 1), np.abs(scattered_field[:, 19]), label="Scattered Field")
+        plt.plot(range(ForwardProblemSolver.rx_count - 1), np.abs(total_field[:, tx_num]), label="Total Field")
+        plt.plot(range(ForwardProblemSolver.rx_count - 1), np.abs(direct_field[:, tx_num]), label="Incident Field")
+        plt.plot(range(ForwardProblemSolver.rx_count - 1), np.abs(scattered_field[:, tx_num]), label="Scattered Field")
         plt.axis([0, 40, 0, 0.06])
         plt.legend()
         plt.show()
@@ -95,5 +95,5 @@ if __name__ == '__main__':
     scatterer = get_grid_permittivity(grid_positions)
     solver = ForwardProblemSolver(scatterer)
     direct_field, direct_power, scattered_field, total_field, total_power = solver.generate_forward_data()
-    ForwardProblemSolver.get_field_plots(total_field, direct_field, scattered_field)
+    ForwardProblemSolver.get_field_plots(total_field, direct_field, scattered_field, 39)
     ForwardProblemSolver.save_data(scatterer, direct_field, direct_power, scattered_field, total_field, total_power)
