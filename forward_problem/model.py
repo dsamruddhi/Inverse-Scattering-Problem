@@ -1,6 +1,7 @@
 import numpy as np
 from scipy.special import jv as bessel1
 from scipy.special import hankel1
+from datetime import datetime
 
 from config import Config
 from utils.doi_utils import DOIUtils
@@ -28,6 +29,11 @@ class MethodOfMomentModel:
 
     nan_remove = True
     noise_level = 0
+
+    # Constants used in code
+    C1 = -impedance * np.pi * (grid_radius / 2)
+    C2 = bessel1(1, wave_number * grid_radius)
+    C3 = hankel1(1, wave_number * grid_radius)
 
     def __init__(self, grid_permittivities):
 
@@ -85,17 +91,17 @@ class MethodOfMomentModel:
 
     def find_grids_with_object(self):
         # Unroll all grid numbers into one array, return the grid numbers that contain objects
-        unrolled_permittivities = self.grid_permittivities.reshape(self.grid_permittivities.size, order='F')
-        self.object_grid_indices = np.nonzero(unrolled_permittivities != 1)
+        self.unrolled_permittivities = self.grid_permittivities.reshape(self.grid_permittivities.size, order='F')
+        self.object_grid_indices = np.nonzero(self.unrolled_permittivities != 1)
         self.object_grid_indices = self.object_grid_indices[0]
 
     def get_field_from_scattering(self):
         """ Object field is a 2D array that captures the field on every point scatterer
         due to every other point scatterer """
-        Z = np.zeros((len(self.object_grid_indices), len(self.object_grid_indices)), dtype=complex)
+
+        Z = np.zeros((len(self.object_grid_indices), len(self.object_grid_indices)), dtype=np.complex64)
         unroll_x = MethodOfMomentModel.grid_positions[0].reshape(MethodOfMomentModel.grid_positions[0].size, order='F')
         unroll_y = MethodOfMomentModel.grid_positions[1].reshape(MethodOfMomentModel.grid_positions[1].size, order='F')
-        unrolled_permittivities = self.grid_permittivities.reshape(self.grid_permittivities.size, order='F')
         x_obj = unroll_x[self.object_grid_indices]
         y_obj = unroll_y[self.object_grid_indices]
 
@@ -104,14 +110,16 @@ class MethodOfMomentModel:
             y_incident = y_obj[index]
 
             dipole_distances = np.sqrt((x_incident - x_obj) ** 2 + (y_incident - y_obj) ** 2)
-            z1 = -MethodOfMomentModel.impedance * np.pi * (MethodOfMomentModel.grid_radius / 2) * \
-                 bessel1(1, MethodOfMomentModel.wave_number * MethodOfMomentModel.grid_radius) * \
-                 hankel1(0, MethodOfMomentModel.wave_number * dipole_distances)
 
-            z1[index] = -MethodOfMomentModel.impedance * np.pi * (MethodOfMomentModel.grid_radius / 2) *\
-                    hankel1(1, MethodOfMomentModel.wave_number * MethodOfMomentModel.grid_radius) - 1j * MethodOfMomentModel.impedance * unrolled_permittivities[value] / (MethodOfMomentModel.wave_number * (unrolled_permittivities[value] - 1))
+            a1 = hankel1(0, MethodOfMomentModel.wave_number * dipole_distances)
+            b1 = MethodOfMomentModel.impedance * self.unrolled_permittivities[value] / (MethodOfMomentModel.wave_number * (self.unrolled_permittivities[value] - 1))
+
+            z1 = MethodOfMomentModel.C1 * MethodOfMomentModel.C2 * a1
+            z1[index] = MethodOfMomentModel.C1 * MethodOfMomentModel.C3 - 1j * b1
+
             assert len(z1) == len(dipole_distances)
             Z[index, :] = z1
+
         return Z
 
     def get_induced_current(self, object_field):
