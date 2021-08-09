@@ -2,9 +2,9 @@ import numpy as np
 import matplotlib.pyplot as plt
 from scipy.io import loadmat
 
-from utils.doi_utils import DOIUtils
 from utils.plot_utils import PlotUtils
 
+from scatterer_code.scatterer import Scatterer
 from forward_problem.solve import ForwardProblemSolver
 from inverse_problem.solve import InverseProblemSolver
 
@@ -12,39 +12,27 @@ if __name__ == '__main__':
 
     """" Define scatterer """
 
-    action = "read"
+    action = "create"
 
     if action == "read":
         scatterer = loadmat("data/scatterer.mat")["scatterer"]
 
     else:
-        grid_positions = DOIUtils.get_grid_centroids("forward")
-        scatterer_params = {
+        scatterer_params = [{
             "shape": "circle",
             "center_x": -0.3,
+            "center_y": -0.5,
+            "size": 0.15,  # radius for circle, side/2 for square,
+            "permittivity": 77
+        }, {
+            "shape": "square",
+            "center_x": 0.3,
             "center_y": 0.5,
-            "size": 0.15,  # radius for circle, side for square,
-            "permittivity": 4
-        }
+            "size": 0.15,  # radius for circle, side/2 for square,
+            "permittivity": 77
+        }]
 
-        m = len(grid_positions[0])
-        scatterer = np.ones((m, m), dtype=float)
-
-        if scatterer_params["shape"] == "circle":
-            scatterer[(grid_positions[0] - scatterer_params["center_x"]) ** 2 +
-                      (grid_positions[1] - scatterer_params["center_y"]) ** 2
-                      <= scatterer_params["size"] ** 2] = scatterer_params["permittivity"]
-
-        elif scatterer_params["shape"] == "square":
-            mask = ((grid_positions[0] <= scatterer_params["center_x"] + scatterer_params["size"]) &
-                    (grid_positions[0] >= scatterer_params["center_x"] - scatterer_params["size"]) &
-
-                    (grid_positions[1] <= scatterer_params["center_y"] + scatterer_params["size"]) &
-                    (grid_positions[1] >= scatterer_params["center_y"] - scatterer_params["size"]))
-            scatterer[mask] = scatterer_params["permittivity"]
-
-        else:
-            raise ValueError("Invalid shape input")
+        scatterer = Scatterer("forward", scatterer_params).generate()
 
     """ Plot scatterer """
 
