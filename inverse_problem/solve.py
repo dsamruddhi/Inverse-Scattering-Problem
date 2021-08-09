@@ -1,7 +1,7 @@
 from inverse_problem.inverse import LinearInverse
 from inverse_problem.models import PRytov, PRytovComplex
-from priors.tikhonov import TikhonovPriors
-from priors.sparsity import SparsityPriors
+from inverse_problem.priors.tikhonov import TikhonovPriors
+from inverse_problem.priors.sparsity import SparsityPriors
 
 
 class InverseProblemSolver:
