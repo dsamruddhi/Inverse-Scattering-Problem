@@ -1,6 +1,10 @@
+import os
+import sys
 import numpy as np
 from scipy.special import jv as bessel1
 from scipy.special import hankel1
+
+sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
 
 from config import Config
 from utils.doi_utils import DOIUtils

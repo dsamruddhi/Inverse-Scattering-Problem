@@ -1,4 +1,8 @@
+import os
+import sys
 import numpy as np
+
+sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
 
 from utils.doi_utils import DOIUtils
 
@@ -20,12 +24,19 @@ class Scatterer:
                 (self.grid_positions[1] <= param["center_y"] + param["size"]) & (self.grid_positions[1] >= param["center_y"] - param["size"]))
         self.scatterer[mask] = param["permittivity"]
 
+    def rectangle_scatterer(self, param):
+        mask = ((self.grid_positions[0] <= param["center_x"] + param["size1"]) & (self.grid_positions[0] >= param["center_x"] - param["size1"]) &
+                (self.grid_positions[1] <= param["center_y"] + param["size2"]) & (self.grid_positions[1] >= param["center_y"] - param["size2"]))
+        self.scatterer[mask] = param["permittivity"]
+
     def generate(self):
         for param in self.scatterer_params:
             if param["shape"] == "circle":
                 self.circle_scatterer(param)
             elif param["shape"] == "square":
                 self.square_scatterer(param)
+            elif param["shape"] == "rectangle":
+                self.rectangle_scatterer(param)
             else:
                 raise ValueError("Invalid scatterer shape")
         return self.scatterer
