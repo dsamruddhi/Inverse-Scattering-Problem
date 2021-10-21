@@ -60,7 +60,7 @@ class Config:
         "length": 1.5,              # meters
         "width": 1.5,               # meters
         "origin": "center",         # values: {"center", "corner"}
-        "forward_grids": 250,
+        "forward_grids": 200,
         "inverse_grids": 50
     }
 

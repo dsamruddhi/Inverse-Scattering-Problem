@@ -1,6 +1,9 @@
 """ Class inheritance = Model -> PRytov -> PRytovComplex """
-
+import os
+import sys
 import numpy as np
+
+sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
 
 from config import Config
 
@@ -33,18 +36,6 @@ class Model:
 
     def get_data(self, *args, **kwargs):
         return
-    #
-    # def remove_nan_values(self, field):
-    #     if self.nan_remove:
-    #         np.fill_diagonal(field, np.nan)
-    #         k = field.reshape(field.size, order='F')
-    #         l = [x for x in k if not np.isnan(x)]
-    #         m = np.reshape(l, (self.number_of_tx, self.number_of_rx-1))
-    #         m = np.transpose(m)
-    #         return m
-    #     if not self.nan_remove:
-    #         field[np.isnan(field)] = 0
-    #         return field
 
 
 class PRytov(Model):

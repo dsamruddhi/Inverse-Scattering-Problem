@@ -1,7 +1,11 @@
+import os
+import sys
+
+sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
+
 from inverse_problem.inverse import LinearInverse
 from inverse_problem.models import PRytov, PRytovComplex
-from inverse_problem.priors.tikhonov import TikhonovPriors
-from inverse_problem.priors.sparsity import SparsityPriors
+from inverse_problem.regularize import Regularizer
 
 
 class InverseProblemSolver:
@@ -40,15 +44,11 @@ class InverseProblemSolver:
 
     def get_regularizer(self):
         mapping = {
-            "lasso": SparsityPriors.lasso,
-            "elastic_net": SparsityPriors.elastic_net,
-            "ridge": TikhonovPriors.ridge,
-            "ridge_complex": TikhonovPriors.ridge_complex,
-            "qs2D": TikhonovPriors.quadratic_smoothing_2d,
-            "qs2D_complex": TikhonovPriors.quadratic_smoothing_2d_complex
+            "ridge": Regularizer.ridge,
+            "qs2D": Regularizer.quadratic_smoothing
         }
         if self.prior not in mapping.keys():
-            raise ValueError("Invalid prior")
+            raise ValueError("Invalid prior value")
         return mapping[self.prior]
 
     def solve(self):
