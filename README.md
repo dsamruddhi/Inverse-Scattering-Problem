@@ -23,4 +23,4 @@ The inverse problem is to reconstruct the image of the scattering object (includ
 
 [1] Chen, Xudong. Computational methods for electromagnetic inverse scattering. John Wiley & Sons, 2018.
 
-[2] A. Dubey, W. Wang, and R. Murch, “Transmission line fault imaging using phaseless inverse scattering and temporal sparsity,” IEEE Transactions on Microwave Theory and Techniques, vol. 69, no. 1, pp. 284–296, 2021.
+[2] Dubey, Amartansh, et al. "An Enhanced Approach to Imaging the Indoor Environment Using WiFi RSSI Measurements." IEEE Transactions on Vehicular Technology 70.9 (2021): 8415-8430.
