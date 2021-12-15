@@ -69,3 +69,16 @@ class PRytovComplex(PRytov):
         A_imag = np.imag(A)
         A_final = np.concatenate((A_real, -A_imag), axis=1)
         return A_final
+
+
+class PRytovImag(PRytov):
+
+    def get_model(self, direct_field, incident_field, integral_values):
+        A = np.zeros((len(self.sensor_links), self.number_of_grids), dtype=complex)
+        for i, pair in enumerate(self.sensor_links):
+            A[i, :] = (self.wave_number ** 2) * np.divide(np.multiply(integral_values[pair[1], :],
+                                                                      np.transpose(incident_field[:, pair[0]])),
+                                                          direct_field[pair[1], pair[0]])
+
+        A_imag = np.imag(A)
+        return -A_imag
