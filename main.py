@@ -20,6 +20,14 @@ if __name__ == '__main__':
         "center_y": 0.35,
         "size": 0.15,
         "permittivity": 4 + 0.4j
+    },
+    {
+
+        "shape": "circle",
+        "center_x": 0.3,
+        "center_y": 0.35,
+        "size": 0.15,
+        "permittivity": 4 + 0.4j
     }
     ]
 
@@ -53,7 +61,7 @@ if __name__ == '__main__':
 
     model_name = "prytov_imag"
     prior = "qs2D"
-    params = {"alpha": 8, "sparse": True}
+    params = {"alpha": 15, "sparse": True}
     inverse_solver = InverseProblemSolver(direct_power, total_power, model_name, prior, params)
 
     if model_name == "prytov_imag":

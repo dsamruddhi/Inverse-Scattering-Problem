@@ -12,12 +12,14 @@ class Regularizer:
         m = Config.doi["inverse_grids"]
         if A.shape[1] == m ** 2:
             chi = np.reshape(chi, (m, m), order='F')
-            chi = 1 + np.real(chi)
+            # chi = 1 + np.real(chi)
+            chi = np.real(chi)
             return chi
         elif A.shape[1] == 2 * m ** 2:
             chi_real = chi[:m ** 2]
             chi_real = np.reshape(chi_real, (m, m), order='F')
-            chi_real = 1 + chi_real
+            # chi_real = 1 + chi_real
+            chi_real = chi_real
             chi_imag = chi[m ** 2:]
             chi_imag = np.reshape(chi_imag, (m, m), order='F')
             return chi_real, chi_imag
