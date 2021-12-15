@@ -19,7 +19,7 @@ if __name__ == '__main__':
         "center_x": -0.3,
         "center_y": 0.35,
         "size": 0.05,
-        "permittivity": 4
+        "permittivity": 4 + 0.4j
     }
     ]
 
