@@ -45,7 +45,9 @@ class InverseProblemSolver:
     def get_regularizer(self):
         mapping = {
             "ridge": Regularizer.ridge,
-            "qs2D": Regularizer.quadratic_smoothing
+            "qs2D": Regularizer.quadratic_smoothing,
+            "lasso": Regularizer.lasso,
+            "elasticnet": Regularizer.elasticnet
         }
         if self.prior not in mapping.keys():
             raise ValueError("Invalid prior value")

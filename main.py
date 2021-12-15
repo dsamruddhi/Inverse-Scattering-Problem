@@ -4,7 +4,7 @@ from scipy.io import savemat
 
 from utils.plot_utils import PlotUtils
 
-from scatterer_code.scatterer import Scatterer
+from scatterer.scatterer import Scatterer
 from forward_problem.solve import ForwardProblemSolver
 from inverse_problem.solve import InverseProblemSolver
 
@@ -52,8 +52,8 @@ if __name__ == '__main__':
     """" Solve Inverse Problem """
 
     model_name = "prytov_complex"
-    prior = "qs2D"
-    params = {"alpha": 8}
+    prior = "elasticnet"
+    params = {"alpha": 0.001, "positive": False, "l1_ratio": 0.3}
     inverse_solver = InverseProblemSolver(direct_power, total_power, model_name, prior, params)
     real_rec, imag_rec = inverse_solver.solve()
 
