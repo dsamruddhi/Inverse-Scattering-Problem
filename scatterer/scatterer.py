@@ -14,7 +14,7 @@ class Scatterer:
         self.scatterer_params = scatterer_params
         self.grid_positions = DOIUtils.get_grid_centroids(problem)
         m = len(self.grid_positions[0])
-        self.scatterer = np.ones((m, m), dtype=float)
+        self.scatterer = np.ones((m, m), dtype=complex)
 
     def circle_scatterer(self, param):
         self.scatterer[(self.grid_positions[0] - param["center_x"]) ** 2 + (self.grid_positions[1] - param["center_y"]) ** 2 <= param["size"] ** 2] = param["permittivity"]
