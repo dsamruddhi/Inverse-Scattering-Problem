@@ -1,9 +1,28 @@
 import numpy as np
+from sklearn.linear_model import Lasso
+from sklearn.linear_model import ElasticNet
 
 from config import Config
 
 
 class Regularizer:
+
+    @staticmethod
+    def _return_chi(chi, A):
+        m = Config.doi["inverse_grids"]
+        if A.shape[1] == m ** 2:
+            chi = np.reshape(chi, (m, m), order='F')
+            chi = 1 + np.real(chi)
+            return chi
+        elif A.shape[1] == 2 * m ** 2:
+            chi_real = chi[:m ** 2]
+            chi_real = np.reshape(chi_real, (m, m), order='F')
+            chi_real = 1 + chi_real
+            chi_imag = chi[m ** 2:]
+            chi_imag = np.reshape(chi_imag, (m, m), order='F')
+            return chi_real, chi_imag
+        else:
+            raise ValueError("Dimensions of model matrix incorrect.")
 
     @staticmethod
     def ridge(A, data, params: dict):
@@ -18,21 +37,7 @@ class Regularizer:
         """
         dim = A.shape[1]
         chi = np.linalg.inv((A.T @ A) + params["alpha"] * np.eye(dim)) @ A.T @ data
-
-        m = Config.doi["inverse_grids"]
-        if A.shape[1] == m**2:
-            chi = np.reshape(chi, (m, m), order='F')
-            chi = 1 + np.real(chi)
-            return chi
-        elif A.shape[1] == 2 * m**2:
-            chi_real = chi[:m ** 2]
-            chi_real = np.reshape(chi_real, (m, m), order='F')
-            chi_real = 1 + chi_real
-            chi_imag = chi[m ** 2:]
-            chi_imag = np.reshape(chi_imag, (m, m), order='F')
-            return chi_real, chi_imag
-        else:
-            raise ValueError("Dimensions of model matrix incorrect.")
+        return Regularizer._return_chi(chi, A)
 
     @staticmethod
     def difference_operator(m, num_grids, direction):
@@ -75,18 +80,37 @@ class Regularizer:
         Dy = Regularizer.difference_operator(m, dim, "vertical")
 
         chi = np.linalg.inv((A.T @ A) + params["alpha"] * (Dx.T @ Dx + Dy.T @ Dy)) @ A.T @ data
+        return Regularizer._return_chi(chi, A)
 
-        if A.shape[1] == m**2:
-            chi = np.reshape(chi, (m, m), order='F')
-            chi = 1 + np.real(chi)
-            return chi
-        elif A.shape[1] == 2 * m**2:
-            chi_real = chi[:m ** 2]
-            chi_real = np.reshape(chi_real, (m, m), order='F')
-            chi_real = 1 + chi_real
+    @staticmethod
+    def lasso(A, data, params: dict):
+        """
+        Lasso regression - induces sparsity
+        :param A: model matrix
+        :param data: measurement data based on the forward model chosen
+        :param params: contains "alpha" representing the regularization parameter,
+                                "positive" representing constraint on obtained coefficients
+        :return: chi if model matrix has m**2 columns,
+        chi_real. chi_imag if model matrix has 2 * m**2 columns
+        """
+        ls = Lasso(params["alpha"], positive=params["positive"])
+        ls.fit(A, data)
+        chi = ls.coef_
+        return Regularizer._return_chi(chi, A)
 
-            chi_imag = chi[m ** 2:]
-            chi_imag = np.reshape(chi_imag, (m, m), order='F')
-            return chi_real, chi_imag
-        else:
-            raise ValueError("Dimensions of model matrix incorrect.")
+    @staticmethod
+    def elasticnet(A, data, params: dict):
+        """
+        ElasticNet regression - combination of l1 and l2 norms
+        :param A: model matrix
+        :param data: measurement data based on the forward model chosen
+        :param params: contains "alpha" representing the regularization parameter of elasticnet,
+                                "l1_ratio" representing the weight of l1 component,
+                                "positive" representing constraint on obtained coefficients
+        :return: chi if model matrix has m**2 columns,
+        chi_real. chi_imag if model matrix has 2 * m**2 columns
+        """
+        ls = ElasticNet(alpha=params["alpha"], l1_ratio=params["l1_ratio"], positive=params["positive"])
+        ls.fit(A, data)
+        chi = ls.coef_
+        return Regularizer._return_chi(chi, A)
