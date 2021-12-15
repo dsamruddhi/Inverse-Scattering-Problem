@@ -40,18 +40,27 @@ class Regularizer:
         return Regularizer._return_chi(chi, A)
 
     @staticmethod
-    def difference_operator(m, num_grids, direction):
+    def difference_operator(m, num_grids, direction, sparse):
 
         d_row = np.zeros((1, num_grids))
         d_row[0, 0] = 1
+
         if direction == "horizontal":
-            d_row[0, 1] = -1
+            if sparse:
+                d_row[0, 1] = -2
+                d_row[0, 2] = 1
+            else:
+                d_row[0, 1] = -1
         elif direction == "vertical":
-            d_row[0, m] = -1
+            if sparse:
+                d_row[0, m] = -2
+                d_row[0, 2*m] = 1
+            else:
+                d_row[0, m] = -1
         else:
             raise ValueError("Invalid direction value for difference operator")
 
-        rows = []
+        rows = list()
         rows.append(d_row)
         for i in range(0, num_grids - 1):
             shifted_row = np.roll(d_row, 1)
@@ -76,8 +85,8 @@ class Regularizer:
         m = Config.doi["inverse_grids"]
         dim = A.shape[1]
 
-        Dx = Regularizer.difference_operator(m, dim, "horizontal")
-        Dy = Regularizer.difference_operator(m, dim, "vertical")
+        Dx = Regularizer.difference_operator(m, dim, "horizontal", sparse=params["sparse"])
+        Dy = Regularizer.difference_operator(m, dim, "vertical",  sparse=params["sparse"])
 
         chi = np.linalg.inv((A.T @ A) + params["alpha"] * (Dx.T @ Dx + Dy.T @ Dy)) @ A.T @ data
         return Regularizer._return_chi(chi, A)
