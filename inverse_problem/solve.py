@@ -4,7 +4,7 @@ import sys
 sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
 
 from inverse_problem.inverse import LinearInverse
-from inverse_problem.models import PRytov, PRytovComplex
+from inverse_problem.models import PRytov, PRytovComplex, PRytovImag
 from inverse_problem.regularize import Regularizer
 
 
@@ -23,6 +23,8 @@ class InverseProblemSolver:
             model_class = PRytov()
         elif self.model_name == "prytov_complex":
             model_class = PRytovComplex()
+        elif self.model_name == "prytov_imag":
+            model_class = PRytovImag()
         else:
             raise ValueError("Incorrect model name, input should be either 'prytov' or 'prytov_complex'")
         return model_class
